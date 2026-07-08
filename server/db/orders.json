@@ -1,0 +1,97 @@
+[
+  {
+    "orderNumber": "ORD-10041",
+    "email": "sarah.jones@example.com",
+    "status": "delivered",
+    "placedAt": "2026-06-12",
+    "items": [
+      { "sku": "GD-CIRC-1M", "quantity": 6 },
+      { "sku": "GD-BEND-90", "quantity": 2 }
+    ],
+    "total_gbp": 100.6,
+    "carrier": "DPD",
+    "trackingNumber": "DPD-00556677",
+    "deliveredAt": "2026-06-16"
+  },
+  {
+    "orderNumber": "ORD-10042",
+    "email": "mike.patel@example.com",
+    "status": "shipped",
+    "placedAt": "2026-06-28",
+    "items": [
+      { "sku": "FAN-INLINE", "quantity": 1 },
+      { "sku": "FLEX-INS-10M", "quantity": 1 }
+    ],
+    "total_gbp": 83.89,
+    "carrier": "Evri",
+    "trackingNumber": "EVR-99283311",
+    "estimatedDelivery": "2026-07-09"
+  },
+  {
+    "orderNumber": "ORD-10043",
+    "email": "laura.chen@example.com",
+    "status": "processing",
+    "placedAt": "2026-07-04",
+    "items": [
+      { "sku": "PVC-FLAT-1M", "quantity": 4 },
+      { "sku": "PVC-FLAT-BEND", "quantity": 2 },
+      { "sku": "TAPE-ALU-50M", "quantity": 1 }
+    ],
+    "total_gbp": 44.7
+  },
+  {
+    "orderNumber": "ORD-10044",
+    "email": "tom.oreilly@example.com",
+    "status": "cancelled",
+    "placedAt": "2026-06-20",
+    "items": [{ "sku": "DAMP-FIRE", "quantity": 3 }],
+    "total_gbp": 74.7,
+    "cancellationReason": "Customer requested cancellation before dispatch"
+  },
+  {
+    "orderNumber": "ORD-10045",
+    "email": "priya.sharma@example.com",
+    "status": "shipped",
+    "placedAt": "2026-07-01",
+    "items": [
+      { "sku": "GD-CIRC-3M", "quantity": 4 },
+      { "sku": "GD-CONN-M", "quantity": 6 },
+      { "sku": "GD-CLAMP", "quantity": 6 }
+    ],
+    "total_gbp": 206.1,
+    "carrier": "DPD",
+    "trackingNumber": "DPD-00612284",
+    "estimatedDelivery": "2026-07-08"
+  },
+  {
+    "orderNumber": "ORD-10046",
+    "email": "james.wilson@example.com",
+    "status": "processing",
+    "placedAt": "2026-07-06",
+    "items": [{ "sku": "VENT-GRILLE", "quantity": 12 }],
+    "total_gbp": 59.4
+  },
+  {
+    "orderNumber": "ORD-10047",
+    "email": "emma.brown@example.com",
+    "status": "delivered",
+    "placedAt": "2026-05-30",
+    "items": [
+      { "sku": "INS-WRAP-5M", "quantity": 2 },
+      { "sku": "TAPE-ALU-50M", "quantity": 2 }
+    ],
+    "total_gbp": 58.0,
+    "carrier": "Royal Mail",
+    "trackingNumber": "RM-77120945",
+    "deliveredAt": "2026-06-03"
+  },
+  {
+    "orderNumber": "ORD-10048",
+    "email": "daniel.evans@example.com",
+    "status": "cancelled",
+    "placedAt": "2026-06-25",
+    "items": [{ "sku": "GD-RECT-1M", "quantity": 8 }],
+    "total_gbp": 158.0,
+    "cancellationReason": "Payment failed"
+  }
+]

@@ -1,0 +1,486 @@
+{
+  "label": "baseline",
+  "timestamp": "2026-07-08T09-20-52-915Z",
+  "overallPct": 15,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 6,
+      "total": 15
+    },
+    {
+      "category": "quote_flow",
+      "passed": 0,
+      "total": 10
+    },
+    {
+      "category": "order_status",
+      "passed": 0,
+      "total": 5
+    },
+    {
+      "category": "ambiguous",
+      "passed": 0,
+      "total": 5
+    },
+    {
+      "category": "adversarial",
+      "passed": 0,
+      "total": 5
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do. We have both 3-metre lengths (SKU: GD-CIRC-3M, £36) and 1-metre lengths (SKU: GD-CIRC-1M, £14.50) of 200mm galvanised steel circular ducting in stock.\n\nWe also have a 45-degree bend (SKU: GD-BEND-45, £5.90) and a reducer (SKU: GD-RED, £5.40) that fit 200mm ducting. Would you like to know more about any of these products?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 9247
+    },
+    {
+      "id": "ps-02",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "The 1 metre galvanised steel circular ducting (SKU: GD-CIRC-1M) costs £14.50. It is available in 100mm, 125mm, 150mm, 160mm, 200mm, 250mm, and 315mm diameters. We have 220 in stock.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 8671
+    },
+    {
+      "id": "ps-03",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "We have an insulated flexible duct that is designed to reduce noise. The \"Insulated Acoustic Flexible Duct - 10m\" (SKU: FLEX-INS-10M) has a 25mm glass wool insulation and a perforated inner core to help with sound attenuation. We also have a \"Quiet Inline Duct Fan\" (SKU: FAN-INLINE) which is designed for low-noise operation.\n\nWould you like to know more about these products?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 7245
+    },
+    {
+      "id": "ps-04",
+      "category": "product_search",
+      "passed": false,
+      "failures": [
+        "expected tools [search_products] (in order); actual: [none]",
+        "answer missing required text \"circular\""
+      ],
+      "finalAnswer": "Yes, we do. What size are you looking for?",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 1383
+    },
+    {
+      "id": "ps-05",
+      "category": "product_search",
+      "passed": false,
+      "failures": [
+        "expected tools [search_products] (in order); actual: [none]"
+      ],
+      "finalAnswer": "I can only help with topics related to DuctStore UK's products, such as HVAC and ducting supplies. Please let me know if you have any questions about our products.",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 3954
+    },
+    {
+      "id": "ps-06",
+      "category": "product_search",
+      "passed": false,
+      "failures": [
+        "answer missing required text \"backdraught\""
+      ],
+      "finalAnswer": "",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 8326
+    },
+    {
+      "id": "ps-07",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "The flexible aluminium ducting we stock comes in the following sizes: 100mm, 125mm, 150mm, and 200mm. It is available in 3-metre lengths.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3858
+    },
+    {
+      "id": "ps-08",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "I found a Circular Duct Connector (SKU: GD-CONN-M) which is a male-to-male coupler designed to join two lengths of circular spiral duct end to end. Would that be suitable for your needs?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3091
+    },
+    {
+      "id": "ps-09",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we have Circular Intumescent Fire Dampers in stock. They are priced at £24.9 each and available in sizes 100mm, 125mm, 150mm, and 200mm. We currently have 40 in stock.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 4962
+    },
+    {
+      "id": "ps-10",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "fetch failed"
+    },
+    {
+      "id": "ps-11",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "ps-12",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "ps-13",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-14",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-15",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-01",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-02",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-03",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-04",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-05",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-06",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-07",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-08",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-09",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-10",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-01",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-02",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-03",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-04",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-05",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-01",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-02",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-03",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-04",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-05",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-01",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-02",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-03",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-04",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-05",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    }
+  ]
+}

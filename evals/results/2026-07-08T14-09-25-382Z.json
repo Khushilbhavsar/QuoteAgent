@@ -1,0 +1,48 @@
+{
+  "label": "fix-1",
+  "timestamp": "2026-07-08T14-09-25-382Z",
+  "overallPct": 33,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 1,
+      "total": 3
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-04",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do! We have a variety of circular ducting products:\n\n*   **Galvanised Steel Circular Duct - 1m Length** (SKU: GD-CIRC-1M) - £14.50\n    Sizes: 100mm, 125mm, 150mm, 160mm, 200mm, 250mm, 315mm\n*   **Galvanised Steel Circular Duct - 3m Length** (SKU: GD-CIRC-3M) - £36.00\n    Sizes: 100mm, 125mm, 150mm, 200mm, 250mm, 315mm\n*   **Galvanised Circular Duct 45 Degree Bend** (SKU: GD-BEND-45) - £5.90\n    Sizes: 100mm, 125mm, 150mm, 200mm, 250mm\n*   **Circular Duct Connector (Male Coupler)** (SKU: GD-CONN-M) - £3.95\n    Sizes: 100mm, 125mm, 150mm, 200mm, 250mm, 315mm\n*   **Round-to-Rectangular Duct Adapter** (SKU: PVC-ADAPT) - £5.95\n    Sizes: 100mm-110x54mm, 125mm-204x60mm, 150mm-204x60mm\n\nDo any of these sound like what you're looking for?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 5104
+    },
+    {
+      "id": "ps-05",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "ps-06",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    }
+  ]
+}

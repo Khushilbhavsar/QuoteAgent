@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Galvanised Steel Circular Duct - 1m Length",
+    "sku": "GD-CIRC-1M",
+    "price_gbp": 14.5,
+    "sizes": ["100mm", "125mm", "150mm", "160mm", "200mm", "250mm", "315mm"],
+    "stock": 220,
+    "category": "circular ducting",
+    "description": "Rigid spiral-wound galvanised steel circular ducting, 1 metre length. Suitable for domestic and commercial ventilation and extraction systems."
+  },
+  {
+    "name": "Galvanised Steel Circular Duct - 3m Length",
+    "sku": "GD-CIRC-3M",
+    "price_gbp": 36.0,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm", "315mm"],
+    "stock": 140,
+    "category": "circular ducting",
+    "description": "Rigid spiral-wound galvanised steel circular ducting, 3 metre length. Fewer joints on long straight runs means less leakage and faster installation."
+  },
+  {
+    "name": "Galvanised Rectangular Duct - 1m Length",
+    "sku": "GD-RECT-1M",
+    "price_gbp": 19.75,
+    "sizes": ["200x100mm", "300x150mm", "400x200mm"],
+    "stock": 90,
+    "category": "rectangular ducting",
+    "description": "Folded galvanised steel rectangular ducting, 1 metre length, for low-profile commercial air distribution where headroom is limited."
+  },
+  {
+    "name": "PVC Flat Channel Rectangular Duct - 1m Length",
+    "sku": "PVC-FLAT-1M",
+    "price_gbp": 7.25,
+    "sizes": ["110x54mm", "204x60mm"],
+    "stock": 180,
+    "category": "rectangular ducting",
+    "description": "Low-profile white PVC rectangular flat channel ducting, 1 metre length. Perfect for kitchen extraction where space above cabinets is tight."
+  },
+  {
+    "name": "PVC Flat Channel 90 Degree Horizontal Bend",
+    "sku": "PVC-FLAT-BEND",
+    "price_gbp": 4.6,
+    "sizes": ["110x54mm", "204x60mm"],
+    "stock": 130,
+    "category": "rectangular ducting",
+    "description": "White PVC 90 degree horizontal elbow for flat channel ducting, turns a duct run around corners and cabinets."
+  },
+  {
+    "name": "Round-to-Rectangular Duct Adapter",
+    "sku": "PVC-ADAPT",
+    "price_gbp": 5.95,
+    "sizes": ["100mm-110x54mm", "125mm-204x60mm", "150mm-204x60mm"],
+    "stock": 110,
+    "category": "fittings & connectors",
+    "description": "Adapter that converts between circular duct and rectangular flat channel, letting you join round spiral duct to low-profile PVC channel."
+  },
+  {
+    "name": "Flexible Aluminium Ducting - 3m",
+    "sku": "FLEX-ALU-3M",
+    "price_gbp": 9.99,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 340,
+    "category": "flexible ducting",
+    "description": "Stretchable multi-layer aluminium flexible duct hose, 3 metre length. Ideal for cooker hoods, tumble dryers and awkward duct runs."
+  },
+  {
+    "name": "PVC Flexible Ducting - 6m",
+    "sku": "FLEX-PVC-6M",
+    "price_gbp": 12.5,
+    "sizes": ["100mm", "125mm", "150mm"],
+    "stock": 200,
+    "category": "flexible ducting",
+    "description": "Lightweight white PVC flexible hose reinforced with a steel wire helix, 6 metre length. Good for bathroom fan and short extraction runs."
+  },
+  {
+    "name": "Insulated Acoustic Flexible Duct - 10m",
+    "sku": "FLEX-INS-10M",
+    "price_gbp": 34.9,
+    "sizes": ["125mm", "150mm", "200mm", "250mm"],
+    "stock": 55,
+    "category": "flexible ducting",
+    "description": "Sound-attenuating flexible ducting with 25mm glass wool insulation and perforated inner core, 10 metre length. Reduces fan noise and condensation in ventilation systems."
+  },
+  {
+    "name": "Circular Duct Connector (Male Coupler)",
+    "sku": "GD-CONN-M",
+    "price_gbp": 3.95,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm", "315mm"],
+    "stock": 310,
+    "category": "fittings & connectors",
+    "description": "Galvanised steel male-to-male coupler that joins two lengths of circular spiral duct end to end. Push-fit with EPDM rubber lip seal."
+  },
+  {
+    "name": "Galvanised Flange Ring Pair",
+    "sku": "GD-FLANGE",
+    "price_gbp": 11.2,
+    "sizes": ["150mm", "200mm", "250mm", "315mm", "400mm"],
+    "stock": 70,
+    "category": "fittings & connectors",
+    "description": "Pair of bolt-together galvanised steel flange rings for making a rigid, demountable flanged joint between two circular duct sections. Includes gasket."
+  },
+  {
+    "name": "Quick-Release Duct Clamp Band",
+    "sku": "GD-CLAMP",
+    "price_gbp": 6.4,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm"],
+    "stock": 260,
+    "category": "fixings & supports",
+    "description": "Stainless steel quick-release clamping band with EPDM seal that pulls two duct ends together tightly without screws or rivets."
+  },
+  {
+    "name": "Galvanised Circular Duct 90 Degree Bend",
+    "sku": "GD-BEND-90",
+    "price_gbp": 6.8,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm"],
+    "stock": 150,
+    "category": "fittings & connectors",
+    "description": "Pressed galvanised steel 90 degree elbow bend for circular ducting. Push-fit connection with EPDM rubber seal."
+  },
+  {
+    "name": "Galvanised Circular Duct 45 Degree Bend",
+    "sku": "GD-BEND-45",
+    "price_gbp": 5.9,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm"],
+    "stock": 120,
+    "category": "fittings & connectors",
+    "description": "Pressed galvanised steel 45 degree elbow bend for circular ducting, for gentler direction changes with lower pressure loss."
+  },
+  {
+    "name": "Galvanised Circular Duct Reducer",
+    "sku": "GD-RED",
+    "price_gbp": 5.4,
+    "sizes": ["150-100mm", "200-150mm", "250-200mm", "315-250mm"],
+    "stock": 95,
+    "category": "fittings & connectors",
+    "description": "Concentric galvanised steel reducer for stepping circular duct runs down to a smaller diameter."
+  },
+  {
+    "name": "Galvanised Circular Duct T-Piece",
+    "sku": "GD-TEE",
+    "price_gbp": 8.9,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 85,
+    "category": "fittings & connectors",
+    "description": "Equal T-piece branch fitting in galvanised steel for splitting circular duct runs."
+  },
+  {
+    "name": "Circular Duct End Cap",
+    "sku": "GD-ENDCAP",
+    "price_gbp": 2.85,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm"],
+    "stock": 190,
+    "category": "fittings & connectors",
+    "description": "Galvanised steel blanking end cap for closing off unused circular duct openings and branches."
+  },
+  {
+    "name": "Manual Volume Control Damper",
+    "sku": "DAMP-VCD",
+    "price_gbp": 13.75,
+    "sizes": ["100mm", "125mm", "150mm", "200mm", "250mm"],
+    "stock": 65,
+    "category": "dampers",
+    "description": "Galvanised steel inline volume control damper with locking quadrant handle for balancing airflow in circular duct systems."
+  },
+  {
+    "name": "Backdraught Shutter (Non-Return Damper)",
+    "sku": "DAMP-NRV",
+    "price_gbp": 7.5,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 145,
+    "category": "dampers",
+    "description": "Inline non-return valve with lightweight butterfly flaps that stop cold air, smells and draughts blowing back into the room when the fan is off."
+  },
+  {
+    "name": "Circular Intumescent Fire Damper",
+    "sku": "DAMP-FIRE",
+    "price_gbp": 24.9,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 40,
+    "category": "dampers",
+    "description": "Intumescent fire damper for circular ducting that expands and seals the duct in a fire, maintaining wall and floor fire ratings."
+  },
+  {
+    "name": "Louvred External Wall Vent Grille",
+    "sku": "VENT-GRILLE",
+    "price_gbp": 4.95,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 400,
+    "category": "grilles & vents",
+    "description": "White plastic louvred external wall grille with fixed shutters and insect screen. Spigot fits standard circular ducting."
+  },
+  {
+    "name": "Egg Crate Ceiling Grille",
+    "sku": "VENT-EGG",
+    "price_gbp": 8.25,
+    "sizes": ["150mm", "200mm", "250mm", "300mm"],
+    "stock": 95,
+    "category": "grilles & vents",
+    "description": "Aluminium egg crate return-air ceiling grille with high free area for extract and return air applications."
+  },
+  {
+    "name": "Quiet Inline Duct Fan",
+    "sku": "FAN-INLINE",
+    "price_gbp": 48.99,
+    "sizes": ["100mm", "125mm", "150mm", "200mm"],
+    "stock": 60,
+    "category": "fans",
+    "description": "Low-noise inline centrifugal extractor fan for mounting inside circular duct runs. 2-speed motor, up to 880 m3/h airflow on the 200mm model."
+  },
+  {
+    "name": "Duct Insulation Wrap - 5m Roll",
+    "sku": "INS-WRAP-5M",
+    "price_gbp": 22.5,
+    "sizes": ["25mm thick", "50mm thick"],
+    "stock": 75,
+    "category": "insulation",
+    "description": "Foil-faced glass mineral wool insulation wrap for thermal and condensation control on circular and rectangular ducting. 5 metre roll, 600mm wide."
+  },
+  {
+    "name": "Aluminium Foil Duct Tape - 50m Roll",
+    "sku": "TAPE-ALU-50M",
+    "price_gbp": 6.5,
+    "sizes": ["48mm wide", "72mm wide"],
+    "stock": 500,
+    "category": "sealants & tape",
+    "description": "High-tack pure aluminium foil tape for sealing joints and seams on rigid and flexible ducting. Heat and moisture resistant."
+  }
+]
