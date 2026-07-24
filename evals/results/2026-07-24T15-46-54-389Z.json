@@ -1,0 +1,254 @@
+{
+  "label": "run",
+  "timestamp": "2026-07-24T15-46-54-389Z",
+  "overallPct": 0,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 0,
+      "total": 7
+    },
+    {
+      "category": "quote_flow",
+      "passed": 0,
+      "total": 5
+    },
+    {
+      "category": "order_status",
+      "passed": 0,
+      "total": 3
+    },
+    {
+      "category": "ambiguous",
+      "passed": 0,
+      "total": 2
+    },
+    {
+      "category": "adversarial",
+      "passed": 0,
+      "total": 3
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "ps-02",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "ps-03",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-04",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-05",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-06",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ps-13",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-01",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-02",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-05",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-07",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "qf-08",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-01",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-02",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-03",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-01",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-04",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-01",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-02",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-03",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    }
+  ]
+}

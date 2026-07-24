@@ -1,6 +1,14 @@
 node_modules/
 .env
+
+# Local tooling / notes — never publish
+.claude/
+project.txt
+
 server/db/runs.jsonl
 server/db/quotes.jsonl
 server/db/escalations.jsonl
-server/db/product-index.json
+
+# NOTE: server/db/product-index.json is intentionally COMMITTED (not ignored)
+# so the deployed server never has to re-embed the catalogue at boot.
+# Rebuild it locally with `npm run build-index` whenever products.json changes.

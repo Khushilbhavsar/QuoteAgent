@@ -1,0 +1,41 @@
+{
+  "label": "fix-3-4",
+  "timestamp": "2026-07-24T15-59-35-343Z",
+  "overallPct": 0,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 0,
+      "total": 1
+    },
+    {
+      "category": "quote_flow",
+      "passed": 0,
+      "total": 1
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-05",
+      "category": "product_search",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "qf-02",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    }
+  ]
+}

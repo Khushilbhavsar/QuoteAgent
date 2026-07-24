@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1000" height="700" fill="#ffffff"/>
+
+  <!-- arrows -->
+  <g stroke="#7a7a7a" stroke-width="2" fill="#7a7a7a">
+    <line x1="500" y1="132" x2="500" y2="176"/>
+    <polygon points="494,176 506,176 500,187"/>
+    <line x1="500" y1="272" x2="500" y2="316"/>
+    <polygon points="494,316 506,316 500,327"/>
+    <line x1="500" y1="412" x2="185" y2="466"/>
+    <polygon points="174,462 189,467 178,477"/>
+    <line x1="500" y1="412" x2="500" y2="466"/>
+    <polygon points="494,466 506,466 500,477"/>
+    <line x1="500" y1="412" x2="815" y2="466"/>
+    <polygon points="826,462 811,467 822,477"/>
+  </g>
+
+  <!-- React chat widget -->
+  <g>
+    <rect x="320" y="42" width="360" height="90" rx="14" fill="#efe9e1" stroke="#cbb99a" stroke-width="1.5"/>
+    <text x="500" y="82" text-anchor="middle" font-size="23" font-weight="700" fill="#3a3a3a">React chat widget</text>
+    <text x="500" y="110" text-anchor="middle" font-size="15" fill="#6b6b6b">Chat UI + approval card (Vercel)</text>
+  </g>
+
+  <!-- Agent server -->
+  <g>
+    <rect x="288" y="182" width="424" height="90" rx="14" fill="#e7e6fb" stroke="#a5a3e0" stroke-width="1.5"/>
+    <text x="500" y="222" text-anchor="middle" font-size="23" font-weight="700" fill="#4b3fa0">Agent server (Node + TS)</text>
+    <text x="500" y="250" text-anchor="middle" font-size="15" fill="#5f56ad">Loop · guardrails · sessions · logging (Render)</text>
+  </g>
+
+  <!-- Gemini API -->
+  <g>
+    <rect x="320" y="322" width="360" height="90" rx="14" fill="#d9f0e6" stroke="#86c9a9" stroke-width="1.5"/>
+    <text x="500" y="362" text-anchor="middle" font-size="23" font-weight="700" fill="#1f7a52">Gemini API</text>
+    <text x="500" y="390" text-anchor="middle" font-size="15" fill="#2f8a63">Plans and picks tools (function calling)</text>
+  </g>
+
+  <!-- tools -->
+  <g>
+    <rect x="40" y="480" width="280" height="100" rx="14" fill="#fbe6df" stroke="#e0a894" stroke-width="1.5"/>
+    <text x="180" y="522" text-anchor="middle" font-size="20" font-weight="700" fill="#9a3b1f">Product search</text>
+    <text x="180" y="548" text-anchor="middle" font-size="14" fill="#a9503a">Local embeddings</text>
+    <text x="180" y="567" text-anchor="middle" font-size="14" fill="#a9503a">(on-device, free)</text>
+  </g>
+  <g>
+    <rect x="360" y="480" width="280" height="100" rx="14" fill="#fbe6df" stroke="#e0a894" stroke-width="1.5"/>
+    <text x="500" y="522" text-anchor="middle" font-size="20" font-weight="700" fill="#9a3b1f">Create quote</text>
+    <text x="500" y="548" text-anchor="middle" font-size="14" fill="#a9503a">Human approval →</text>
+    <text x="500" y="567" text-anchor="middle" font-size="14" fill="#a9503a">quotes.jsonl</text>
+  </g>
+  <g>
+    <rect x="680" y="480" width="280" height="100" rx="14" fill="#fbe6df" stroke="#e0a894" stroke-width="1.5"/>
+    <text x="820" y="522" text-anchor="middle" font-size="20" font-weight="700" fill="#9a3b1f">Order status</text>
+    <text x="820" y="548" text-anchor="middle" font-size="14" fill="#a9503a">Mock orders</text>
+    <text x="820" y="567" text-anchor="middle" font-size="14" fill="#a9503a">(email + order-no. check)</text>
+  </g>
+
+  <text x="500" y="645" text-anchor="middle" font-size="17" fill="#555555">&#8635; tool results return to the model until the task is done</text>
+</svg>

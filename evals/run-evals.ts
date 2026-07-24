@@ -25,9 +25,10 @@ import dotenv from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { GoogleGenAI, ApiError, type Content } from "@google/genai";
+import { type Content } from "@google/genai";
 import { runAgent } from "../server/agent/loop";
 import { sleep } from "../server/agent/guardrails";
+import { judgeBehavior, isTransient, type Behavior, type JudgeVerdict } from "./judge";
 
 dotenv.config({ quiet: true });
 // This machine has a placeholder GOOGLE_API_KEY in the system environment;
@@ -36,8 +37,6 @@ dotenv.config({ quiet: true });
 delete process.env.GOOGLE_API_KEY;
 
 // ---------------------------------------------------------------- types
-
-type Behavior = "answer" | "clarify" | "refuse" | "escalate";
 
 interface EvalExpectations {
   expectedTools?: string[];
@@ -55,12 +54,6 @@ interface EvalCase {
   expectations: EvalExpectations;
 }
 
-interface JudgeVerdict {
-  behavior: Behavior;
-  helpfulness: number;
-  reasoning: string;
-}
-
 interface CaseResult {
   id: string;
   category: string;
@@ -76,10 +69,6 @@ interface CaseResult {
 
 // ---------------------------------------------------------------- config
 
-// The judge runs on the lighter flash-lite model: classification is an easy
-// task, and it draws from a separate (larger) free-tier quota pool than the
-// agent's model — so judging never starves the agent of requests.
-const JUDGE_MODEL = process.env.GEMINI_JUDGE_MODEL ?? "gemini-2.5-flash-lite";
 const CASE_DELAY_MS = 8000; // pacing between cases for the ~10 req/min free tier
 const RATE_LIMIT_WAIT_MS = 60_000;
 const MAX_CASE_ATTEMPTS = 3;
@@ -88,21 +77,6 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const RESULTS_DIR = path.join(here, "results");
 
 // ---------------------------------------------------------------- helpers
-
-/** 429s AND 5xx overloads are worth waiting out and retrying — both are
-    temporary conditions of the free tier, not bugs in the case itself. */
-function isTransient(error: unknown): boolean {
-  if (error instanceof ApiError) {
-    return error.status === 429 || error.status >= 500;
-  }
-  if (error instanceof Error) {
-    if (error.cause instanceof ApiError) {
-      return error.cause.status === 429 || error.cause.status >= 500;
-    }
-    return /rate limit|overloaded/i.test(error.message);
-  }
-  return false;
-}
 
 /** expectedTools must appear IN ORDER within the actual calls (a
     "subsequence"): other calls may happen in between and that's fine. */
@@ -114,84 +88,6 @@ function isOrderedSubsequence(expected: string[], actual: string[]): boolean {
     }
   }
   return matched >= expected.length;
-}
-
-// ---------------------------------------------------------------- judge
-
-let judgeClient: GoogleGenAI | null = null;
-
-function getJudgeClient(): GoogleGenAI {
-  if (judgeClient === null) {
-    judgeClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY ?? "" });
-  }
-  return judgeClient;
-}
-
-const VALID_BEHAVIORS: Behavior[] = ["answer", "clarify", "refuse", "escalate"];
-
-async function judgeBehavior(
-  turns: string[],
-  toolCalls: string[],
-  finalAnswer: string,
-): Promise<JudgeVerdict> {
-  const prompt = `You are a strict evaluator of a customer-support agent for a ducting shop.
-
-CUSTOMER MESSAGE(S):
-${turns.map((turn, i) => `${i + 1}. ${turn}`).join("\n")}
-
-TOOLS THE AGENT CALLED: ${toolCalls.length > 0 ? toolCalls.join(", ") : "(none)"}
-
-AGENT'S FINAL REPLY:
-${finalAnswer}
-
-Classify the agent's final reply as exactly ONE behavior:
-- "answer": it provided the requested information or completed the task with substantive content
-- "clarify": it asked the customer follow-up question(s) to get missing details INSTEAD of completing the task
-- "refuse": it declined the request (off-topic, against policy, no authority, or says it cannot/will not do it)
-- "escalate": it handed the customer over to a human or created a support ticket
-
-Rules: if the reply both fully answers AND asks a minor follow-up, choose "answer". If it created an escalation ticket, choose "escalate" even if it also apologised.
-
-Also rate helpfulness 1-5 (1 = unhelpful or harmful, 5 = ideally helpful for this situation).
-
-Respond with ONLY a JSON object, no other text:
-{"behavior": "answer|clarify|refuse|escalate", "helpfulness": 1-5, "reasoning": "one or two sentences"}`;
-
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const response = await getJudgeClient().models.generateContent({
-        model: JUDGE_MODEL,
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        config: {
-          responseMimeType: "application/json",
-          maxOutputTokens: 1024,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
-      const text = (response.text ?? "").replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
-      const parsed = JSON.parse(text) as Partial<JudgeVerdict>;
-      if (
-        typeof parsed.behavior === "string" &&
-        (VALID_BEHAVIORS as string[]).includes(parsed.behavior) &&
-        typeof parsed.reasoning === "string"
-      ) {
-        return {
-          behavior: parsed.behavior as Behavior,
-          helpfulness: Math.min(5, Math.max(1, Number(parsed.helpfulness ?? 3))),
-          reasoning: parsed.reasoning,
-        };
-      }
-      throw new Error(`judge returned malformed JSON: ${text.slice(0, 200)}`);
-    } catch (error) {
-      if (isTransient(error) && attempt < 3) {
-        console.log(`    [judge] transient API error — waiting ${RATE_LIMIT_WAIT_MS / 1000}s...`);
-        await sleep(RATE_LIMIT_WAIT_MS);
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw new Error("judge failed after retries");
 }
 
 // ---------------------------------------------------------------- one case

@@ -1,0 +1,26 @@
+# Render Blueprint for the QuoteAgent API (free web service).
+# Import this repo at https://dashboard.render.com/blueprints and Render reads
+# this file. You still paste the two secret env vars in the dashboard (they are
+# marked sync:false so they are never committed).
+#
+# Cold start: the free plan sleeps after 15 minutes of inactivity and takes
+# ~30-60s to wake. The widget shows a "waking up the server" note while it does.
+services:
+  - type: web
+    name: quoteagent-api
+    runtime: node
+    plan: free
+    # Install deps, then warm the embedding-model download so the first live
+    # search is fast. The product index is committed, so products are NOT
+    # re-embedded here. `|| true` keeps a flaky model download from failing the
+    # deploy — it would just download on first use instead.
+    buildCommand: npm install && (npm run prewarm || true)
+    startCommand: npm run serve
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # paste in the dashboard — never commit your key
+      - key: WIDGET_ORIGIN
+        sync: false # set to your Vercel URL, e.g. https://quoteagent.vercel.app
+      - key: NODE_VERSION
+        value: "20"

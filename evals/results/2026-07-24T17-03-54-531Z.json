@@ -1,0 +1,55 @@
+{
+  "label": "post-refactor-flashlite",
+  "timestamp": "2026-07-24T17-03-54-531Z",
+  "overallPct": 100,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "category": "quote_flow",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do. We have 3m lengths (SKU: GD-CIRC-3M, £36) and 1m lengths (SKU: GD-CIRC-1M, £14.50) of 200mm circular galvanised steel ducting. We also have a 45-degree bend (SKU: GD-BEND-45, £5.90) and a reducer (SKU: GD-RED, £5.40) that fits 200mm ducting.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 4076
+    },
+    {
+      "id": "ps-13",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "The price of SKU GD-TEE (Galvanised Circular Duct T-Piece) is £8.90.",
+      "toolCalls": [
+        "get_product_details"
+      ],
+      "incidents": [],
+      "durationMs": 2514
+    },
+    {
+      "id": "qf-01",
+      "category": "quote_flow",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "I've already created the quote request in my previous turn. You should receive an email confirmation shortly with quote ID Q-1784912631500.",
+      "toolCalls": [
+        "create_quote_request"
+      ],
+      "incidents": [],
+      "durationMs": 4571
+    }
+  ]
+}

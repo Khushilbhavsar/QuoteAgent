@@ -1,0 +1,26 @@
+{
+  "label": "smoke-test",
+  "timestamp": "2026-07-24T15-31-14-631Z",
+  "overallPct": 100,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do! We have a couple of options for 200mm circular ducting:\n\n*   **Galvanised Steel Circular Duct - 3m Length** (SKU: GD-CIRC-3M) - £36.00\n*   **Galvanised Steel Circular Duct - 1m Length** (SKU: GD-CIRC-1M) - £14.50\n\nBoth are in stock. We also have 200mm bends, reducers, and T-pieces if you need them.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 4375
+    }
+  ]
+}

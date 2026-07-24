@@ -9,7 +9,14 @@
  *   3. repeats until the model returns plain text
  *      (or MAX_ITERATIONS is hit, which throws a clear error)
  *
- * Every run is appended to server/db/runs.jsonl by the logger.
+ * Human-in-the-loop approval works three ways, chosen by the caller:
+ *   - evalMode:        auto-approve drafts (non-interactive eval runs)
+ *   - onApprovalRequired: await a callback in place (the CLI's y/n prompt)
+ *   - pauseOnApproval: RETURN the draft + a resumable snapshot so an HTTP
+ *                      server can answer request 1 now and finish the run in
+ *                      request 2 (/api/approve). See runAgentTurn / resumeAgentTurn.
+ *
+ * Every completed run is appended to server/db/runs.jsonl by the logger.
  */
 import {
   GoogleGenAI,
@@ -17,6 +24,7 @@ import {
   type Content,
   type Part,
   type FunctionDeclaration,
+  type FunctionCall,
   type GenerateContentResponse,
 } from "@google/genai";
 import { agentTools, toGeminiFunctionDeclarations, type AgentTool } from "../tools/index";
@@ -59,7 +67,7 @@ export interface ToolCallRecord {
   isError: boolean;
 }
 
-/** What runAgent returns — the Phase 1 shape plus guardrail incidents. */
+/** What a completed run returns — the Phase 1 shape plus guardrail incidents. */
 export interface AgentRunResult {
   finalText: string;
   toolCallsMade: ToolCallRecord[];
@@ -81,8 +89,7 @@ export interface RunAgentOptions {
   /**
    * Called when a requiresApproval tool has produced a draft. The loop is
    * paused (awaiting this promise) until it resolves: true = approve and
-   * commit, false = decline. If no handler is provided, drafts are declined
-   * automatically — the safe default.
+   * commit, false = decline. Used by the CLI.
    */
   onApprovalRequired?: (request: ApprovalRequest) => Promise<boolean>;
   /**
@@ -90,6 +97,12 @@ export interface RunAgentOptions {
    * non-interactive. NEVER set this in the real chat/API path.
    */
   evalMode?: boolean;
+  /**
+   * HTTP mode: instead of blocking, the loop RETURNS a { status:
+   * "pending_approval" } outcome carrying a resumable snapshot. The server
+   * stores it and later calls resumeAgentTurn() with the human's decision.
+   */
+  pauseOnApproval?: boolean;
 }
 
 // The client is created lazily so a missing API key produces a friendly
@@ -183,59 +196,25 @@ async function callGemini(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
-/**
- * The human-in-the-loop pause. If an approval-gated tool returned a
- * { status: "pending_approval" } draft, show it to the human and either
- * commit the real action (y) or report the decline (n) back to the model.
- * Any other result (e.g. invalid SKUs) passes through untouched so the
- * model can self-correct without bothering the human.
- */
-async function resolveApproval(
-  tool: AgentTool,
-  outcome: ToolOutcome,
-  options: RunAgentOptions | undefined,
-): Promise<ToolOutcome> {
-  let draftEnvelope: unknown;
+// ---------------------------------------------------------------- approval helpers
+
+/** True if a tool result is an unresolved { status: "pending_approval" } draft. */
+function isPendingApproval(content: string): unknown | null {
+  let envelope: unknown;
   try {
-    draftEnvelope = JSON.parse(outcome.content);
+    envelope = JSON.parse(content);
   } catch {
-    return outcome; // not JSON — treat as a normal result
+    return null;
   }
-  const isPending =
-    draftEnvelope !== null &&
-    typeof draftEnvelope === "object" &&
-    (draftEnvelope as { status?: unknown }).status === "pending_approval";
-  if (!isPending) {
-    return outcome;
-  }
+  const pending =
+    envelope !== null &&
+    typeof envelope === "object" &&
+    (envelope as { status?: unknown }).status === "pending_approval";
+  return pending ? envelope : null;
+}
 
-  // The loop genuinely pauses here: we await the human's answer.
-  // In eval mode there is no human, so drafts are auto-approved to keep
-  // eval runs non-interactive.
-  const approved =
-    options?.evalMode === true
-      ? true
-      : options?.onApprovalRequired !== undefined
-        ? await options.onApprovalRequired({
-            toolName: tool.name,
-            prompt: tool.approvalPrompt ?? `Approve this "${tool.name}" action? (y/n)`,
-            draft: JSON.stringify(draftEnvelope, null, 2),
-          })
-        : false; // no approval channel → decline (the safe default)
-
-  if (!approved) {
-    return {
-      content: JSON.stringify({
-        status: "declined",
-        message:
-          options?.onApprovalRequired !== undefined
-            ? "The user reviewed the draft and DECLINED it. Acknowledge politely; do not retry unless they explicitly ask again."
-            : "No human approval channel is available, so the action was cancelled for safety.",
-      }),
-      isError: false,
-    };
-  }
-
+/** Run a tool's real side effect after approval, translating failures. */
+async function commitApproved(tool: AgentTool, draftEnvelope: unknown): Promise<ToolOutcome> {
   if (tool.commitApproved === undefined) {
     return {
       content: `Tool "${tool.name}" requires approval but has no commitApproved handler — this is a bug in the tool definition.`,
@@ -250,59 +229,126 @@ async function resolveApproval(
   }
 }
 
-/**
- * Run the agent for one user message.
- *
- * `history` is the ongoing conversation; this function appends the new user
- * message, every intermediate model/functionResponse turn, and the final
- * answer to it in place — so the caller can just keep passing the same array.
- */
-export async function runAgent(
-  userMessage: string,
-  history: Content[],
-  options?: RunAgentOptions,
-): Promise<AgentRunResult> {
-  history.push({ role: "user", parts: [{ text: userMessage }] });
+/** The tool result to feed back when a draft is declined. */
+function declineOutcome(hasHumanChannel: boolean): ToolOutcome {
+  return {
+    content: JSON.stringify({
+      status: "declined",
+      message: hasHumanChannel
+        ? "The user reviewed the draft and DECLINED it. Acknowledge politely; do not retry unless they explicitly ask again."
+        : "No human approval channel is available, so the action was cancelled for safety.",
+    }),
+    isError: false,
+  };
+}
 
-  const toolCallsMade: ToolCallRecord[] = [];
-  const tokensUsed: TokenUsage = { inputTokens: 0, outputTokens: 0 };
-  const incidents: GuardrailIncident[] = [];
-  const budget = { used: 0 };
+/** Build the Gemini functionResponse part for one tool call's outcome. */
+function toResponsePart(name: string, callId: string | undefined, outcome: ToolOutcome): Part {
+  return {
+    functionResponse: {
+      ...(callId !== undefined ? { id: callId } : {}),
+      name,
+      // Gemini convention: "output" key for success, "error" for failure.
+      response: outcome.isError ? { error: outcome.content } : { output: outcome.content },
+    },
+  };
+}
+
+// ---------------------------------------------------------------- run state
+
+/** Mutable state of one run — the part that must survive an approval pause. */
+interface RunContext {
+  history: Content[];
+  toolCallsMade: ToolCallRecord[];
+  tokensUsed: TokenUsage;
+  incidents: GuardrailIncident[];
+  budget: { used: number };
+  /** First user message of the run, kept for the log entry. */
+  userMessage: string;
+  /** How many Gemini turns we have taken (for the MAX_ITERATIONS cap). */
+  iteration: number;
+}
+
+/** What the caller shows a human when a run pauses for approval. */
+export interface PendingApprovalInfo {
+  toolName: string;
+  approvalPrompt: string;
+  /** Pretty-printed draft envelope. */
+  draft: string;
+  /** Structured draft (e.g. the quote), for rendering an approval card. */
+  quoteDraft?: unknown;
+}
+
+/**
+ * A frozen, resumable snapshot of a run paused at an approval. Stored in the
+ * server's session and passed back to resumeAgentTurn() with the decision.
+ */
+export interface PausedRun {
+  context: RunContext;
+  /** Tool responses for the paused turn; the approval slot is a null hole. */
+  responseParts: (Part | null)[];
+  approvalIndex: number;
+  toolName: string;
+  callId?: string;
+  draftEnvelope: unknown;
+}
+
+/** A run either finishes, or pauses waiting for a human approval. */
+export type RunOutcome =
+  | { status: "done"; result: AgentRunResult }
+  | { status: "pending_approval"; pending: PendingApprovalInfo; paused: PausedRun };
+
+// ---------------------------------------------------------------- the loop
+
+const functionCallsOf = (parts: Part[]): FunctionCall[] =>
+  parts.map((part) => part.functionCall).filter((call): call is FunctionCall => call != null);
+
+/**
+ * Drive the Gemini <-> tools loop over a run context until it produces a
+ * final answer, pauses for approval (pauseOnApproval), or hits a cap.
+ *
+ * `resumeParts`, when given, are the completed tool responses of a
+ * previously-paused turn: we push them as the next user turn and carry on.
+ */
+async function driveLoop(
+  ctx: RunContext,
+  options: RunAgentOptions | undefined,
+  resumeParts: Part[] | undefined,
+): Promise<RunOutcome> {
   const functionDeclarations = toGeminiFunctionDeclarations(agentTools);
 
-  // Record (but don't block) suspected prompt-injection attempts — the
-  // system prompt handles the refusal; this makes the attempt auditable.
-  if (detectInjectionAttempt(userMessage)) {
-    incidents.push("injection_attempt_suspected");
-    console.warn("  [guardrails] possible prompt-injection attempt recorded");
+  if (resumeParts !== undefined) {
+    ctx.history.push({ role: "user", parts: resumeParts });
+    ctx.iteration += 1; // the approval turn is done; the next Gemini call is a new turn
   }
 
-  for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
+  while (ctx.iteration <= MAX_ITERATIONS) {
     let response: GenerateContentResponse;
     try {
-      response = await callGemini(history, functionDeclarations, budget);
+      response = await callGemini(ctx.history, functionDeclarations, ctx.budget);
     } catch (error) {
       if (error instanceof BudgetExceededError) {
-        return await stopForBudget(userMessage, toolCallsMade, tokensUsed, incidents, iteration);
+        return { status: "done", result: await stopForBudget(ctx) };
       }
       throw error;
     }
-    trackUsage(tokensUsed, response.usageMetadata);
+    trackUsage(ctx.tokensUsed, response.usageMetadata);
 
     // Always append the model's full reply (including functionCall parts)
     // so the API sees a complete conversation on the next call.
     const parts: Part[] = response.candidates?.[0]?.content?.parts ?? [];
-    history.push({ role: "model", parts: parts.length > 0 ? parts : [{ text: "" }] });
+    ctx.history.push({ role: "model", parts: parts.length > 0 ? parts : [{ text: "" }] });
 
-    const functionCalls = parts
-      .map((part) => part.functionCall)
-      .filter((call): call is NonNullable<typeof call> => call != null);
+    const functionCalls = functionCallsOf(parts);
 
     if (functionCalls.length > 0) {
-      // Execute every requested tool; ALL functionResponse parts go back
-      // in ONE user turn, in the same order as the calls.
-      const responseParts: Part[] = [];
-      for (const call of functionCalls) {
+      // Execute every requested tool; ALL functionResponse parts go back in
+      // ONE user turn, in the same order as the calls.
+      const responseParts: (Part | null)[] = [];
+      let pause: { index: number; toolName: string; callId?: string; draftEnvelope: unknown } | null = null;
+
+      for (let i = 0; i < functionCalls.length; i++) {
+        const call = functionCalls[i];
         const toolName = call.name ?? "(unnamed)";
         const toolInput = call.args ?? {};
         console.log(`  [tool] ${toolName} ${JSON.stringify(toolInput)}`);
@@ -312,29 +358,68 @@ export async function runAgent(
           ? await runToolWithGuardrails(tool, toolInput)
           : { content: `Unknown tool "${toolName}".`, isError: true };
 
-        // Approval-gated tools pause the run for a human decision here.
-        if (tool !== undefined && tool.requiresApproval === true && !outcome.isError) {
-          outcome = await resolveApproval(tool, outcome, options);
+        const draftEnvelope =
+          tool?.requiresApproval === true && !outcome.isError ? isPendingApproval(outcome.content) : null;
+
+        if (draftEnvelope !== null && tool !== undefined) {
+          if (options?.evalMode === true) {
+            outcome = await commitApproved(tool, draftEnvelope);
+          } else if (options?.pauseOnApproval === true && pause === null) {
+            // Defer this call: remember the hole, and pause AFTER finishing
+            // the rest of the turn so every call still gets a response.
+            pause = {
+              index: i,
+              toolName,
+              ...(call.id !== undefined ? { callId: call.id } : {}),
+              draftEnvelope,
+            };
+            responseParts.push(null); // placeholder, filled on resume
+            continue;
+          } else if (options?.onApprovalRequired !== undefined) {
+            const approved = await options.onApprovalRequired({
+              toolName,
+              prompt: tool.approvalPrompt ?? `Approve this "${toolName}" action? (y/n)`,
+              draft: JSON.stringify(draftEnvelope, null, 2),
+            });
+            outcome = approved ? await commitApproved(tool, draftEnvelope) : declineOutcome(true);
+          } else {
+            outcome = declineOutcome(false); // no channel → decline (safe default)
+          }
         }
 
-        toolCallsMade.push({
+        ctx.toolCallsMade.push({
           name: toolName,
           input: toolInput,
           result: outcome.content,
           isError: outcome.isError,
         });
-        responseParts.push({
-          functionResponse: {
-            ...(call.id !== undefined ? { id: call.id } : {}),
-            name: toolName,
-            // Gemini convention: "output" key for success, "error" for failure.
-            response: outcome.isError
-              ? { error: outcome.content }
-              : { output: outcome.content },
-          },
-        });
+        responseParts.push(toResponsePart(toolName, call.id, outcome));
       }
-      history.push({ role: "user", parts: responseParts });
+
+      if (pause !== null) {
+        const envelope = pause.draftEnvelope as { quoteDraft?: unknown };
+        const tool = agentTools.find((t) => t.name === pause!.toolName);
+        return {
+          status: "pending_approval",
+          pending: {
+            toolName: pause.toolName,
+            approvalPrompt: tool?.approvalPrompt ?? `Approve this "${pause.toolName}" action?`,
+            draft: JSON.stringify(pause.draftEnvelope, null, 2),
+            quoteDraft: envelope.quoteDraft,
+          },
+          paused: {
+            context: ctx,
+            responseParts,
+            approvalIndex: pause.index,
+            toolName: pause.toolName,
+            ...(pause.callId !== undefined ? { callId: pause.callId } : {}),
+            draftEnvelope: pause.draftEnvelope,
+          },
+        };
+      }
+
+      ctx.history.push({ role: "user", parts: responseParts.filter((p): p is Part => p !== null) });
+      ctx.iteration += 1;
       continue; // back to Gemini with the tool results
     }
 
@@ -352,62 +437,145 @@ export async function runAgent(
         "Sorry — I didn't manage to put together a reply there. Could you rephrase your question, or ask me again?";
     }
 
-    // Output guard: any £price in the answer that can't be grounded in
-    // this run's tool results (or the catalogue) gets replaced.
+    // Output guard: any £price in the answer that can't be grounded in this
+    // run's tool results (or the catalogue) gets replaced.
     const audit = auditAnswerPrices(
       rawFinalText,
-      toolCallsMade.map((call) => call.result),
+      ctx.toolCallsMade.map((call) => call.result),
     );
     if (audit.hallucinated) {
-      incidents.push("hallucinated_price");
+      ctx.incidents.push("hallucinated_price");
       console.warn("  [guardrails] unverified price removed from the answer");
     }
-    const finalText = audit.answer;
 
     const result: AgentRunResult = {
-      finalText,
-      toolCallsMade,
-      tokensUsed,
-      iterations: iteration,
-      incidents,
+      finalText: audit.answer,
+      toolCallsMade: ctx.toolCallsMade,
+      tokensUsed: ctx.tokensUsed,
+      iterations: ctx.iteration,
+      incidents: ctx.incidents,
     };
     logRun({
-      userMessage,
-      toolCalls: toolCallsMade,
-      iterations: iteration,
-      tokens: tokensUsed,
-      finalAnswer: finalText,
-      incidents,
+      userMessage: ctx.userMessage,
+      toolCalls: ctx.toolCallsMade,
+      iterations: ctx.iteration,
+      tokens: ctx.tokensUsed,
+      finalAnswer: audit.answer,
+      incidents: ctx.incidents,
     });
-    return result;
+    return { status: "done", result };
   }
 
   // Log what we have before failing so the run is still traceable.
-  incidents.push("max_iterations_hit");
+  ctx.incidents.push("max_iterations_hit");
   logRun({
-    userMessage,
-    toolCalls: toolCallsMade,
+    userMessage: ctx.userMessage,
+    toolCalls: ctx.toolCallsMade,
     iterations: MAX_ITERATIONS,
-    tokens: tokensUsed,
+    tokens: ctx.tokensUsed,
     finalAnswer: "[aborted: max iterations exceeded]",
-    incidents,
+    incidents: ctx.incidents,
   });
   throw new MaxIterationsError(MAX_ITERATIONS);
 }
 
+// ---------------------------------------------------------------- public API
+
+/**
+ * Start a run for one user message. Returns either a finished result or a
+ * pending-approval snapshot (only possible when pauseOnApproval is set).
+ *
+ * `history` is the ongoing conversation; this function appends the new user
+ * message and every intermediate turn to it in place.
+ */
+export async function runAgentTurn(
+  userMessage: string,
+  history: Content[],
+  options?: RunAgentOptions,
+): Promise<RunOutcome> {
+  history.push({ role: "user", parts: [{ text: userMessage }] });
+
+  const ctx: RunContext = {
+    history,
+    toolCallsMade: [],
+    tokensUsed: { inputTokens: 0, outputTokens: 0 },
+    incidents: [],
+    budget: { used: 0 },
+    userMessage,
+    iteration: 1,
+  };
+
+  // Record (but don't block) suspected prompt-injection attempts — the system
+  // prompt handles the refusal; this makes the attempt auditable.
+  if (detectInjectionAttempt(userMessage)) {
+    ctx.incidents.push("injection_attempt_suspected");
+    console.warn("  [guardrails] possible prompt-injection attempt recorded");
+  }
+
+  return driveLoop(ctx, options, undefined);
+}
+
+/**
+ * Resume a run that paused for approval. `approved` = the human's decision.
+ * Commits or declines the draft, then drives the loop to a final answer.
+ */
+export async function resumeAgentTurn(
+  paused: PausedRun,
+  approved: boolean,
+  options?: RunAgentOptions,
+): Promise<RunOutcome> {
+  const tool = agentTools.find((t) => t.name === paused.toolName);
+  let outcome: ToolOutcome;
+  if (tool === undefined) {
+    outcome = { content: `Tool "${paused.toolName}" not found on resume.`, isError: true };
+  } else if (approved) {
+    outcome = await commitApproved(tool, paused.draftEnvelope);
+  } else {
+    outcome = declineOutcome(true);
+  }
+
+  paused.context.toolCallsMade.push({
+    name: paused.toolName,
+    input: paused.draftEnvelope,
+    result: outcome.content,
+    isError: outcome.isError,
+  });
+
+  // Fill the null hole with the decided response, then continue the turn.
+  const filled = [...paused.responseParts];
+  filled[paused.approvalIndex] = toResponsePart(paused.toolName, paused.callId, outcome);
+  const completeParts = filled.filter((part): part is Part => part !== null);
+
+  return driveLoop(paused.context, options, completeParts);
+}
+
+/**
+ * Convenience wrapper for callers that never pause (CLI with
+ * onApprovalRequired, or evals with evalMode): returns the finished result
+ * directly. Throws if a pause was somehow requested without a pause handler.
+ */
+export async function runAgent(
+  userMessage: string,
+  history: Content[],
+  options?: RunAgentOptions,
+): Promise<AgentRunResult> {
+  const outcome = await runAgentTurn(userMessage, history, options);
+  if (outcome.status === "pending_approval") {
+    throw new Error(
+      "runAgent() reached a pending approval but no approval channel was provided. " +
+        "Use runAgentTurn()/resumeAgentTurn() for the HTTP pause flow, or pass onApprovalRequired/evalMode.",
+    );
+  }
+  return outcome.result;
+}
+
 /**
  * Graceful stop when the model-call budget runs out: record the incident,
- * open an escalation ticket, and return a polite handoff message instead
- * of crashing the conversation.
+ * open an escalation ticket, and return a polite handoff message instead of
+ * crashing the conversation.
  */
-async function stopForBudget(
-  userMessage: string,
-  toolCallsMade: ToolCallRecord[],
-  tokensUsed: TokenUsage,
-  incidents: GuardrailIncident[],
-  iterations: number,
-): Promise<AgentRunResult> {
-  incidents.push("budget_exceeded");
+async function stopForBudget(ctx: RunContext): Promise<AgentRunResult> {
+  ctx.incidents.push("budget_exceeded");
   console.warn(
     `  [guardrails] model-call budget (${MAX_MODEL_CALLS_PER_RUN}) exceeded — stopping gracefully`,
   );
@@ -419,7 +587,7 @@ async function stopForBudget(
       const parsed = JSON.parse(
         await escalate.execute({
           reason: "Agent run exceeded its model-call budget",
-          conversationSummary: `The run for "${userMessage}" hit the ${MAX_MODEL_CALLS_PER_RUN}-call budget and was stopped before completing.`,
+          conversationSummary: `The run for "${ctx.userMessage}" hit the ${MAX_MODEL_CALLS_PER_RUN}-call budget and was stopped before completing.`,
         }),
       ) as { ticketId?: string };
       ticketId = parsed.ticketId ?? ticketId;
@@ -432,14 +600,20 @@ async function stopForBudget(
     "I'm sorry — this request needed more processing than I'm allowed to use in one go, so I've stopped and " +
     `passed it to a human colleague (ticket ${ticketId}). They will follow up with you shortly.`;
 
-  const result: AgentRunResult = { finalText, toolCallsMade, tokensUsed, iterations, incidents };
+  const result: AgentRunResult = {
+    finalText,
+    toolCallsMade: ctx.toolCallsMade,
+    tokensUsed: ctx.tokensUsed,
+    iterations: ctx.iteration,
+    incidents: ctx.incidents,
+  };
   logRun({
-    userMessage,
-    toolCalls: toolCallsMade,
-    iterations,
-    tokens: tokensUsed,
+    userMessage: ctx.userMessage,
+    toolCalls: ctx.toolCallsMade,
+    iterations: ctx.iteration,
+    tokens: ctx.tokensUsed,
     finalAnswer: finalText,
-    incidents,
+    incidents: ctx.incidents,
   });
   return result;
 }

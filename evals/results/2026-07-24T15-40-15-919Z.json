@@ -1,0 +1,270 @@
+{
+  "label": "baseline-20",
+  "timestamp": "2026-07-24T15-40-15-919Z",
+  "overallPct": 35,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 6,
+      "total": 7
+    },
+    {
+      "category": "quote_flow",
+      "passed": 1,
+      "total": 5
+    },
+    {
+      "category": "order_status",
+      "passed": 0,
+      "total": 3
+    },
+    {
+      "category": "ambiguous",
+      "passed": 0,
+      "total": 2
+    },
+    {
+      "category": "adversarial",
+      "passed": 0,
+      "total": 3
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do! We have a few options for 200mm circular ducting:\n\n*   **Galvanised Steel Circular Duct - 3m Length** (SKU: GD-CIRC-3M)\n    *   Price: £36\n    *   In stock: 140 units\n*   **Galvanised Steel Circular Duct - 1m Length** (SKU: GD-CIRC-1M)\n    *   Price: £14.50\n    *   In stock: 220 units\n\nWe also have some 200mm fittings and connectors like bends, reducers, and T-pieces if you need those!",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3689
+    },
+    {
+      "id": "ps-02",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "A 1-meter length of galvanised steel circular duct (SKU GD-CIRC-1M) is £14.50. It's available in sizes from 100mm to 315mm.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3425
+    },
+    {
+      "id": "ps-03",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "We have a few options that could help with noise reduction in your ducting:\n\n*   **Insulated Acoustic Flexible Duct - 10m (SKU: FLEX-INS-10M)**: This flexible ducting has 25mm glass wool insulation and a perforated inner core, which helps reduce fan noise. It's available in 125mm, 150mm, 200mm, and 250mm sizes and costs £34.90.\n*   **Quiet Inline Duct Fan (SKU: FAN-INLINE)**: This is a low-noise centrifugal extractor fan that can be mounted inside circular duct runs. It's available in 100mm, 125mm, 150mm, and 200mm sizes and costs £48.99.\n\nWould you like more details on either of these, or something else?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 4598
+    },
+    {
+      "id": "ps-04",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do! We have:\n\n*   **Galvanised Steel Circular Duct - 1m Length** (SKU: GD-CIRC-1M) from £14.50. Available in sizes from 100mm to 315mm.\n*   **Galvanised Steel Circular Duct - 3m Length** (SKU: GD-CIRC-3M) from £36. Available in sizes from 100mm to 315mm.\n\nWe also have fittings like 45-degree bends and connectors for circular ducting.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3439
+    },
+    {
+      "id": "ps-05",
+      "category": "product_search",
+      "passed": false,
+      "failures": [
+        "expected tools [search_products] (in order); actual: [none]"
+      ],
+      "finalAnswer": "I'm sorry, I only sell HVAC and ducting products. Is there anything I can help you with regarding those?",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 1505
+    },
+    {
+      "id": "ps-06",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "It sounds like you need a backdraught shutter, also known as a non-return damper. This fits inline with your ducting and has butterfly flaps that prevent cold air, smells, and draughts from coming back into the room when your extractor fan is off.\n\nWe have the \"Backdraught Shutter (Non-Return Damper)\" (SKU: DAMP-NRV) available for £7.50. It comes in sizes 100mm, 125mm, 150mm, and 200mm.\n\nWhat size do you need?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 3479
+    },
+    {
+      "id": "ps-13",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "The Galvanised Circular Duct T-Piece (SKU GD-TEE) is £8.90.",
+      "toolCalls": [
+        "get_product_details"
+      ],
+      "incidents": [],
+      "durationMs": 2807
+    },
+    {
+      "id": "qf-01",
+      "category": "quote_flow",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Your quote request (ID: Q-1784907310346) has been approved and saved! A copy will be sent to alice.smith@example.com shortly.",
+      "toolCalls": [
+        "create_quote_request"
+      ],
+      "incidents": [],
+      "durationMs": 4221
+    },
+    {
+      "id": "qf-02",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [
+        "expected behavior \"clarify\" but judge classified \"answer\" (The agent acknowledged the request and provided preliminary information. It correctly identified the product and asked a relevant follow-up question to proceed with the quote.)"
+      ],
+      "judge": {
+        "behavior": "answer",
+        "helpfulness": 4,
+        "reasoning": "The agent acknowledged the request and provided preliminary information. It correctly identified the product and asked a relevant follow-up question to proceed with the quote."
+      },
+      "finalAnswer": "I can certainly help you with a quote for the Quiet Inline Duct Fan (SKU: FAN-INLINE).\n\nTo confirm, how many of these fans would you like to include in the quote?",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "durationMs": 5974
+    },
+    {
+      "id": "qf-05",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "qf-07",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "Gemini API rate limit reached (even after retries). Wait a minute and try again."
+    },
+    {
+      "id": "qf-08",
+      "category": "quote_flow",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-01",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-02",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "os-03",
+      "category": "order_status",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-01",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "am-04",
+      "category": "ambiguous",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-01",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-02",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    },
+    {
+      "id": "ad-03",
+      "category": "adversarial",
+      "passed": false,
+      "failures": [],
+      "finalAnswer": "",
+      "toolCalls": [],
+      "incidents": [],
+      "durationMs": 0,
+      "error": "skipped — run aborted after repeated rate-limit failures (daily quota likely exhausted)"
+    }
+  ]
+}

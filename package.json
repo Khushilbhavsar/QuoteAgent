@@ -6,19 +6,28 @@
   "description": "AI support & quote agent for an HVAC/ducting e-commerce store",
   "scripts": {
     "chat": "tsx server/index.ts",
+    "serve": "tsx server/server.ts",
+    "serve:watch": "tsx watch server/server.ts",
+    "dev": "concurrently -n api,web -c blue,green \"npm:serve:watch\" \"npm:web\"",
+    "web": "npm --prefix widget run dev",
+    "build": "npm --prefix widget ci && npm --prefix widget run build",
     "build-index": "tsx server/db/build-index.ts",
+    "prewarm": "tsx server/db/prewarm.ts",
     "typecheck": "tsc --noEmit",
     "evals": "tsx evals/run-evals.ts"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
+    "@hono/node-server": "^2.0.11",
     "@xenova/transformers": "^2.17.2",
     "dotenv": "^17.4.2",
+    "hono": "^4.12.32",
+    "tsx": "^4.23.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",
-    "tsx": "^4.23.0",
+    "concurrently": "^10.0.3",
     "typescript": "^6.0.3"
   }
 }

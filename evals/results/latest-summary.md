@@ -1,18 +1,11 @@
-# Eval results — fix-1
+# Eval results — post-refactor-flashlite
 
-Run: 2026-07-08T14-09-25-382Z | Overall: **1/3 (33%)**
+Run: 2026-07-24T17-03-54-531Z | Overall: **3/3 (100%)**
 
 | Category | Passed | Total | Rate |
 |---|---|---|---|
-| product_search | 1 | 3 | 33% |
-| **overall** | **1** | **3** | **33%** |
+| product_search | 2 | 2 | 100% |
+| quote_flow | 1 | 1 | 100% |
+| **overall** | **3** | **3** | **100%** |
 
-## Failed cases (2)
-
-### ps-05 (product_search)
-- ERROR: Gemini API rate limit reached (even after retries). Wait a minute and try again.
-- final answer: 
-
-### ps-06 (product_search)
-- ERROR: Gemini API rate limit reached (even after retries). Wait a minute and try again.
-- final answer: 
+## Failed cases (0)
