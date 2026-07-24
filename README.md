@@ -120,7 +120,7 @@ eval runner's auto-approve — one loop, three approval modes.
 
 | Decision | Why |
 |---|---|
-| **LLM client isolated behind one module** (`server/agent/loop.ts`) | The rest of the app never touches the SDK, so swapping model/provider is a one-file change. |
+| **Provider-swappable LLM client** (`server/llm/client.ts`) | The loop never touches a vendor SDK — switch model/provider with one env var (`LLM_PROVIDER=gemini\|groq`). Groq's roomier free tier is an escape hatch from Gemini's ~20/day quota. |
 | **Local on-device embeddings** (`@xenova/transformers`) for search | Free, no API/key/rate-limit for retrieval; the semantic match is what stops the agent inventing products. |
 | **Committed, precomputed product index** | The server never re-embeds the catalogue at boot — it loads `product-index.json`. Build-time prewarm caches the query model too. |
 | **0.4 similarity threshold** | Below it, "we don't stock that" is the honest answer. Tuned so real synonyms match but unrelated items ("laptops") don't. |
@@ -158,25 +158,39 @@ A fourth fix (mandatory search on *all* sell/stock questions, targeting
 ### Methodology
 
 20 test cases ([`evals/testcases.json`](evals/testcases.json)) across 5
-categories — product_search (7), quote_flow (5), order_status (3), ambiguous
-(2), adversarial (3) — run through the **real** agent (real API calls, real
+categories — product_search (8), quote_flow (5), order_status (3), ambiguous
+(2), adversarial (2) — run through the **real** agent (real API calls, real
 tools, fresh conversation per case, auto-approved drafts). Two scoring layers:
 
 1. **Programmatic** — required tools called (in order), forbidden tools not
    called, required/forbidden substrings in the answer.
 2. **LLM-as-judge** — a separate model call ([`evals/judge.ts`](evals/judge.ts),
-   on flash-lite) classifies behaviour (answer / clarify / refuse / escalate)
-   against the case's expectation, with a strict JSON-only rubric. It lives in
-   its own module so the runner and any re-scoring use one identical prompt.
+   on flash-lite) — **only for cases with an `expectBehavior`** — classifies
+   behaviour (answer / clarify / refuse / escalate) with a strict JSON-only
+   rubric. Verdicts are cached by case-id + answer-hash so re-runs never
+   re-judge an unchanged answer.
 
 A case passes only if every check passes. Reports: console table,
 `evals/results/<timestamp>.json`, `evals/results/latest-summary.md`.
 
+**Quota-aware & resumable** (a deliberate design for the ~20-request/day free
+key): each case is capped at 5 iterations; the runner tracks every model call,
+stops cleanly before exceeding `--budget`, and checkpoints after every case so
+`--resume` finishes the run another day.
+
 ```bash
-npm run evals -- --label baseline            # full suite
-npm run evals -- --only ps-04,ps-05          # specific cases
-npm run evals -- --category adversarial      # one category
+npm run evals                                # run under the default budget (18)
+npm run evals -- --resume                    # continue yesterday's stopped run
+npm run evals -- --dry-run                   # re-score last answers, ZERO API calls
+npm run evals -- --budget 12                 # stop before making >12 calls
+npm run evals -- --category quote_flow       # one category
+npm run evals -- --id ps-04                  # one case
+LLM_PROVIDER=groq npm run evals              # run the whole suite on Groq's free tier
 ```
+
+A fast end-to-end **smoke test** (`npm run smoke`) exercises the whole agent in
+≤6 requests (product Q → quote+approval → off-topic refusal → injection),
+plus no-API checks; `npm run smoke -- --offline` runs just the no-API checks.
 
 ### Latest baseline — `baseline-20`, 2026-07-24 (gemini-2.5-flash)
 
@@ -235,6 +249,7 @@ npm run chat                 # CLI chat with the agent
 
 # Quality
 npm run typecheck            # strict TS, both server and widget
+npm run smoke                # ≤6-request end-to-end test (--offline for no-API)
 npm run evals                # evaluation suite (see Evaluation above)
 ```
 
@@ -255,7 +270,10 @@ server/
 ├── server.ts            HTTP API (Hono): /api/chat, /api/approve, /api/health,
 │                        sessions, rate limits, CORS
 ├── index.ts             CLI chat (blocking y/n approval)
-├── agent/loop.ts        agent loop: Gemini <-> tools; pause/resume approval,
+├── smoke.ts             `npm run smoke` — ≤6-request end-to-end test
+├── ratelimit.ts         side-effect-free rate-limit helpers (server + smoke)
+├── llm/client.ts        provider-swappable LLM client (gemini | groq)
+├── agent/loop.ts        agent loop: model <-> tools; pause/resume approval,
 │                        budget stop, price audit, empty-answer fallback
 ├── agent/guardrails.ts  caps, retries, Zod validation, injection detection,
 │                        price audit, incident types
@@ -269,11 +287,12 @@ server/
 ├── db/prewarm.ts        build-time model warm-up
 └── db/product-index.json  committed precomputed embeddings (loaded at boot)
 evals/
-├── testcases.json       20 eval cases
-├── run-evals.ts         eval runner (agent loop + programmatic scoring)
+├── testcases.json       20 eval cases (8/5/3/2/2)
+├── run-evals.ts         quota-aware, resumable runner (budget/checkpoint/resume/dry-run)
 ├── judge.ts             LLM-as-judge (flash-lite): behaviour classifier
 ├── BASELINE.md          baseline scores, failure analysis, fix log
 └── results/             generated reports (committed as evidence)
+AUDIT.md                 final audit checklist + smoke/eval results
 widget/                  React + Vite chat widget (chat UI + approval card)
 ├── src/App.tsx          chat state machine
 ├── src/api.ts           API client (cold-start + timeout + retry)

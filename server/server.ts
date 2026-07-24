@@ -22,6 +22,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { Content } from "@google/genai";
 import { runAgentTurn, resumeAgentTurn, type PausedRun } from "./agent/loop";
+import { withinLastHour } from "./ratelimit";
 
 dotenv.config({ quiet: true });
 // This machine has a placeholder GOOGLE_API_KEY in the system environment;
@@ -35,7 +36,6 @@ const PORT = Number(process.env.PORT ?? 8787);
 // may call the API from a browser (CORS). Defaults to the Vite dev server.
 const WIDGET_ORIGIN = process.env.WIDGET_ORIGIN ?? "http://localhost:5173";
 
-const HOUR_MS = 60 * 60 * 1000;
 const SESSION_TTL_MS = 30 * 60 * 1000; // sessions expire after 30 min idle
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_MESSAGES_PER_SESSION_PER_HOUR = 20;
@@ -71,10 +71,6 @@ function sweepExpiredSessions(now: number): void {
     }
   }
 }
-
-/** Keep only timestamps from within the last hour. */
-const withinLastHour = (times: number[], now: number): number[] =>
-  times.filter((t) => now - t < HOUR_MS);
 
 /** Best-effort client IP behind a proxy (Render/Vercel set x-forwarded-for). */
 function clientIp(headerValue: string | undefined): string {

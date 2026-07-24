@@ -7,6 +7,7 @@
   "scripts": {
     "chat": "tsx server/index.ts",
     "serve": "tsx server/server.ts",
+    "smoke": "tsx server/smoke.ts",
     "serve:watch": "tsx watch server/server.ts",
     "dev": "concurrently -n api,web -c blue,green \"npm:serve:watch\" \"npm:web\"",
     "web": "npm --prefix widget run dev",

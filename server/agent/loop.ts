@@ -19,16 +19,14 @@
  * Every completed run is appended to server/db/runs.jsonl by the logger.
  */
 import {
-  GoogleGenAI,
   ApiError,
   type Content,
   type Part,
   type FunctionDeclaration,
   type FunctionCall,
-  type GenerateContentResponse,
 } from "@google/genai";
 import { agentTools, toGeminiFunctionDeclarations, type AgentTool } from "../tools/index";
-import { SYSTEM_PROMPT } from "./prompts";
+import { generate, type ModelTurn } from "../llm/client";
 import {
   MAX_ITERATIONS,
   MAX_MODEL_CALLS_PER_RUN,
@@ -45,15 +43,7 @@ import {
 } from "./guardrails";
 import { logRun } from "../db/logger";
 
-/**
- * Default is gemini-2.5-flash: new free-tier keys have NO quota for the
- * older gemini-2.0-flash (the API returns 429 with "limit: 0" for it).
- * Override with GEMINI_MODEL in .env if your key differs.
- */
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
-const MAX_OUTPUT_TOKENS = 8192;
-
-// The @google/genai SDK does not retry failed requests itself, so we do:
+// The LLM SDKs don't retry failed requests themselves, so we do:
 // rate-limit (429) and server/overload (5xx) errors are retried with
 // exponential backoff before we give up with a friendly message.
 const MAX_API_ATTEMPTS = 3;
@@ -73,6 +63,8 @@ export interface AgentRunResult {
   toolCallsMade: ToolCallRecord[];
   tokensUsed: TokenUsage;
   iterations: number;
+  /** Number of Gemini calls this run made — used by the eval runner's budget. */
+  modelCalls: number;
   incidents: GuardrailIncident[];
 }
 
@@ -103,34 +95,22 @@ export interface RunAgentOptions {
    * stores it and later calls resumeAgentTurn() with the human's decision.
    */
   pauseOnApproval?: boolean;
-}
-
-// The client is created lazily so a missing API key produces a friendly
-// error at chat time instead of a crash the moment this file is imported.
-let cachedClient: GoogleGenAI | null = null;
-
-function getClient(): GoogleGenAI {
-  if (cachedClient === null) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error(
-        "GEMINI_API_KEY is not set. Copy .env.example to .env and paste your key from https://aistudio.google.com/apikey",
-      );
-    }
-    cachedClient = new GoogleGenAI({ apiKey });
-  }
-  return cachedClient;
+  /**
+   * Override MAX_ITERATIONS for this run (the eval runner caps cases at 5 to
+   * bound API cost). Defaults to MAX_ITERATIONS.
+   */
+  maxIterations?: number;
 }
 
 /**
- * Call Gemini once, retrying transient failures and translating raw API
- * errors into friendly messages.
+ * Call the model once (via the provider-swappable client), retrying transient
+ * failures and translating raw API errors into friendly messages.
  */
-async function callGemini(
+async function callModel(
   contents: Content[],
   functionDeclarations: FunctionDeclaration[],
   budget: { used: number },
-): Promise<GenerateContentResponse> {
+): Promise<ModelTurn> {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt++) {
@@ -141,18 +121,7 @@ async function callGemini(
     }
     budget.used += 1;
     try {
-      return await getClient().models.generateContent({
-        model: MODEL,
-        contents,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          tools: [{ functionDeclarations }],
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          // 2.5-series models "think" before answering by default, which is
-          // slower and burns free-tier tokens; a support agent doesn't need it.
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
+      return await generate(contents, functionDeclarations);
     } catch (error) {
       lastError = error;
       const status = error instanceof ApiError ? error.status : undefined;
@@ -316,27 +285,28 @@ async function driveLoop(
   resumeParts: Part[] | undefined,
 ): Promise<RunOutcome> {
   const functionDeclarations = toGeminiFunctionDeclarations(agentTools);
+  const maxIterations = options?.maxIterations ?? MAX_ITERATIONS;
 
   if (resumeParts !== undefined) {
     ctx.history.push({ role: "user", parts: resumeParts });
     ctx.iteration += 1; // the approval turn is done; the next Gemini call is a new turn
   }
 
-  while (ctx.iteration <= MAX_ITERATIONS) {
-    let response: GenerateContentResponse;
+  while (ctx.iteration <= maxIterations) {
+    let response: ModelTurn;
     try {
-      response = await callGemini(ctx.history, functionDeclarations, ctx.budget);
+      response = await callModel(ctx.history, functionDeclarations, ctx.budget);
     } catch (error) {
       if (error instanceof BudgetExceededError) {
         return { status: "done", result: await stopForBudget(ctx) };
       }
       throw error;
     }
-    trackUsage(ctx.tokensUsed, response.usageMetadata);
+    trackUsage(ctx.tokensUsed, response.usage);
 
     // Always append the model's full reply (including functionCall parts)
     // so the API sees a complete conversation on the next call.
-    const parts: Part[] = response.candidates?.[0]?.content?.parts ?? [];
+    const parts: Part[] = response.parts;
     ctx.history.push({ role: "model", parts: parts.length > 0 ? parts : [{ text: "" }] });
 
     const functionCalls = functionCallsOf(parts);
@@ -453,6 +423,7 @@ async function driveLoop(
       toolCallsMade: ctx.toolCallsMade,
       tokensUsed: ctx.tokensUsed,
       iterations: ctx.iteration,
+      modelCalls: ctx.budget.used,
       incidents: ctx.incidents,
     };
     logRun({
@@ -471,12 +442,12 @@ async function driveLoop(
   logRun({
     userMessage: ctx.userMessage,
     toolCalls: ctx.toolCallsMade,
-    iterations: MAX_ITERATIONS,
+    iterations: maxIterations,
     tokens: ctx.tokensUsed,
     finalAnswer: "[aborted: max iterations exceeded]",
     incidents: ctx.incidents,
   });
-  throw new MaxIterationsError(MAX_ITERATIONS);
+  throw new MaxIterationsError(maxIterations);
 }
 
 // ---------------------------------------------------------------- public API
@@ -605,6 +576,7 @@ async function stopForBudget(ctx: RunContext): Promise<AgentRunResult> {
     toolCallsMade: ctx.toolCallsMade,
     tokensUsed: ctx.tokensUsed,
     iterations: ctx.iteration,
+    modelCalls: ctx.budget.used,
     incidents: ctx.incidents,
   };
   logRun({

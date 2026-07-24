@@ -1,0 +1,28 @@
+{
+  "label": "budget-demo",
+  "timestamp": "2026-07-24T17-42-37-853Z",
+  "overallPct": 100,
+  "scores": [
+    {
+      "category": "product_search",
+      "passed": 1,
+      "total": 1
+    }
+  ],
+  "results": [
+    {
+      "id": "ps-01",
+      "category": "product_search",
+      "passed": true,
+      "failures": [],
+      "finalAnswer": "Yes, we do. We have 3m lengths (SKU: GD-CIRC-3M, £36) and 1m lengths (SKU: GD-CIRC-1M, £14.50) of 200mm galvanised steel circular ducting. We also have a 45-degree bend (SKU: GD-BEND-45, £5.90), a reducer (SKU: GD-RED, £5.40) and a T-piece (SKU: GD-TEE, £8.90) in 200mm.",
+      "toolCalls": [
+        "search_products"
+      ],
+      "incidents": [],
+      "modelCalls": 2,
+      "answerHash": "d015348d05ff2a97",
+      "durationMs": 3950
+    }
+  ]
+}
